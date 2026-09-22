@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+struct node {
+    char data;
+    struct node *left *right;
+    
+};
+
+struct node *stack[50]
+int top=-1;
+
+void push(struct node *n) {
+    stack [++top]=n;
+}
+struct node *pop() {
+    return stack[top--];
+}
+
+struct node *create(char ch){
+    struct node *n =malloc(sizeof(struct node));
+    n->data=ch;
+    n->left=n->right=NULL;
+    return n;
+}
+int priority (char ch){
+    if (ch=='+'||ch=='-')
+        return 1;
+    if (ch=='*'||ch=='/')
+        return 2;
+    return 0;
+}
+void post()
+
+        
