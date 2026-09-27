@@ -8,9 +8,10 @@ struct Node
     struct Node *right;
 };
 
-struct Node *createNode(int value)
+struct Node* createNode(int value)
 {
-    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+    struct Node *newNode =
+        (struct Node*)malloc(sizeof(struct Node));
 
     newNode->data = value;
     newNode->left = NULL;
@@ -19,7 +20,7 @@ struct Node *createNode(int value)
     return newNode;
 }
 
-struct Node *insert(struct Node *root, int value)
+struct Node* insert(struct Node *root, int value)
 {
     if (root == NULL)
         return createNode(value);
@@ -33,7 +34,7 @@ struct Node *insert(struct Node *root, int value)
     return root;
 }
 
-struct Node *search(struct Node *root, int value)
+struct Node* search(struct Node *root, int value)
 {
     if (root == NULL || root->data == value)
         return root;
@@ -42,6 +43,83 @@ struct Node *search(struct Node *root, int value)
         return search(root->left, value);
 
     return search(root->right, value);
+}
+
+struct Node* findMin(struct Node *root)
+{
+    while (root->left != NULL)
+        root = root->left;
+
+    return root;
+}
+
+struct Node* findMax(struct Node *root)
+{
+    while (root->right != NULL)
+        root = root->right;
+
+    return root;
+}
+
+struct Node* deleteNode(struct Node *root, int value)
+{
+    if (root == NULL)
+        return NULL;
+
+    if (value < root->data)
+    {
+        root->left = deleteNode(root->left, value);
+    }
+    else if (value > root->data)
+    {
+        root->right = deleteNode(root->right, value);
+    }
+    else
+    {
+        if (root->left == NULL && root->right == NULL)
+        {
+            free(root);
+            return NULL;
+        }
+
+        else if (root->left == NULL)
+        {
+            struct Node *temp = root->right;
+            free(root);
+            return temp;
+        }
+
+        else if (root->right == NULL)
+        {
+            struct Node *temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        else
+        {
+            struct Node *temp = findMin(root->right);
+
+            root->data = temp->data;
+
+            root->right =
+                deleteNode(root->right, temp->data);
+        }
+    }
+
+    return root;
+}
+
+int height(struct Node *root)
+{
+    if (root == NULL)
+        return 0;
+
+    int leftHeight = height(root->left);
+    int rightHeight = height(root->right);
+
+    return 1 + (leftHeight > rightHeight ?
+                leftHeight : rightHeight);
 }
 
 void inorder(struct Node *root)
@@ -77,35 +155,96 @@ void postorder(struct Node *root)
 int main()
 {
     struct Node *root = NULL;
-    int n, value, searchValue;
+    int choice, value;
 
-    printf("Enter number of nodes: ");
-    scanf("%d", &n);
-
-    printf("Enter values: ");
-
-    for (int i = 0; i < n; i++)
+    while (1)
     {
-        scanf("%d", &value);
-        root = insert(root, value);
+        printf("\n\n--- BST MENU ---\n");
+        printf("1. Insert\n");
+        printf("2. Search\n");
+        printf("3. Delete\n");
+        printf("4. Find Minimum\n");
+        printf("5. Find Maximum\n");
+        printf("6. Height\n");
+        printf("7. Inorder\n");
+        printf("8. Preorder\n");
+        printf("9. Postorder\n");
+        printf("10. Exit\n");
+
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+            case 1:
+                printf("Enter value: ");
+                scanf("%d", &value);
+
+                root = insert(root, value);
+                break;
+
+            case 2:
+                printf("Enter value to search: ");
+                scanf("%d", &value);
+
+                if (search(root, value) != NULL)
+                    printf("Element found");
+                else
+                    printf("Element not found");
+
+                break;
+
+            case 3:
+                printf("Enter value to delete: ");
+                scanf("%d", &value);
+
+                root = deleteNode(root, value);
+                break;
+
+            case 4:
+                if (root == NULL)
+                    printf("Tree is empty");
+                else
+                    printf("Minimum = %d",
+                           findMin(root)->data);
+
+                break;
+
+            case 5:
+                if (root == NULL)
+                    printf("Tree is empty");
+                else
+                    printf("Maximum = %d",
+                           findMax(root)->data);
+
+                break;
+
+            case 6:
+                printf("Height = %d", height(root));
+                break;
+
+            case 7:
+                printf("Inorder: ");
+                inorder(root);
+                break;
+
+            case 8:
+                printf("Preorder: ");
+                preorder(root);
+                break;
+
+            case 9:
+                printf("Postorder: ");
+                postorder(root);
+                break;
+
+            case 10:
+                exit(0);
+
+            default:
+                printf("Invalid choice");
+        }
     }
-
-    printf("\nInorder: ");
-    inorder(root);
-
-    printf("\nPreorder: ");
-    preorder(root);
-
-    printf("\nPostorder: ");
-    postorder(root);
-
-    printf("\n\nEnter value to search: ");
-    scanf("%d", &searchValue);
-
-    if (search(root, searchValue) != NULL)
-        printf("Value found");
-    else
-        printf("Value not found");
 
     return 0;
 }
