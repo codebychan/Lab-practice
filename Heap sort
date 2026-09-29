@@ -1,0 +1,127 @@
+#include <stdio.h>
+
+void swap(int *a, int *b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+/* Heapify for Max Heap */
+void heapify(int a[], int n, int i)
+{
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && a[left] > a[largest])
+        largest = left;
+
+    if (right < n && a[right] > a[largest])
+        largest = right;
+
+    if (largest != i)
+    {
+        swap(&a[i], &a[largest]);
+        heapify(a, n, largest);
+    }
+}
+
+/* Build Max Heap */
+void buildHeap(int a[], int n)
+{
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(a, n, i);
+}
+
+/* Heap Sort */
+void heapSort(int a[], int n)
+{
+    buildHeap(a, n);
+
+    for (int i = n - 1; i > 0; i--)
+    {
+        swap(&a[0], &a[i]);
+
+        heapify(a, i, 0);
+    }
+}
+
+/* Insert into Max Heap */
+void insert(int heap[], int *n, int value)
+{
+    int i = *n;
+
+    heap[i] = value;
+    (*n)++;
+
+    while (i > 0)
+    {
+        int parent = (i - 1) / 2;
+
+        if (heap[parent] >= heap[i])
+            break;
+
+        swap(&heap[parent], &heap[i]);
+
+        i = parent;
+    }
+}
+
+/* Delete Maximum */
+int deleteMax(int heap[], int *n)
+{
+    int max = heap[0];
+
+    heap[0] = heap[*n - 1];
+    (*n)--;
+
+    heapify(heap, *n, 0);
+
+    return max;
+}
+
+void display(int a[], int n)
+{
+    for (int i = 0; i < n; i++)
+        printf("%d ", a[i]);
+
+    printf("\n");
+}
+
+int main()
+{
+    int heap[50];
+    int n = 0;
+
+    /* Priority Queue */
+    insert(heap, &n, 30);
+    insert(heap, &n, 50);
+    insert(heap, &n, 20);
+    insert(heap, &n, 40);
+    insert(heap, &n, 60);
+
+    printf("Priority Queue (Max Heap): ");
+    display(heap, n);
+
+    printf("Highest Priority: %d\n", heap[0]);
+
+    printf("Deleted: %d\n", deleteMax(heap, &n));
+
+    printf("After deletion: ");
+    display(heap, n);
+
+    /* Heap Sort */
+    int a[] = {4, 10, 3, 5, 1};
+    int size = 5;
+
+    printf("\nBefore Heap Sort: ");
+    display(a, size);
+
+    heapSort(a, size);
+
+    printf("After Heap Sort: ");
+    display(a, size);
+
+    return 0;
+}
