@@ -1,0 +1,120 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Node {
+    char word[50];
+    char meaning[100];
+    struct Node *left, *right;
+};
+
+struct Node* createNode(char word[], char meaning[]) {
+    struct Node *newNode = malloc(sizeof(struct Node));
+
+    strcpy(newNode->word, word);
+    strcpy(newNode->meaning, meaning);
+
+    newNode->left = NULL;
+    newNode->right = NULL;
+
+    return newNode;
+}
+
+struct Node* insert(struct Node *root, char word[], char meaning[]) {
+    if (root == NULL)
+        return createNode(word, meaning);
+
+    if (strcmp(word, root->word) < 0)
+        root->left = insert(root->left, word, meaning);
+    else if (strcmp(word, root->word) > 0)
+        root->right = insert(root->right, word, meaning);
+    else
+        strcpy(root->meaning, meaning);
+
+    return root;
+}
+
+void search(struct Node *root, char word[]) {
+    if (root == NULL) {
+        printf("Word not found.\n");
+        return;
+    }
+
+    if (strcmp(word, root->word) == 0)
+        printf("Meaning: %s\n", root->meaning);
+    else if (strcmp(word, root->word) < 0)
+        search(root->left, word);
+    else
+        search(root->right, word);
+}
+
+struct Node* findMin(struct Node *root) {
+    while (root->left != NULL)
+        root = root->left;
+
+    return root;
+}
+
+struct Node* delete(struct Node *root, char word[]) {
+    if (root == NULL)
+        return NULL;
+
+    if (strcmp(word, root->word) < 0)
+        root->left = delete(root->left, word);
+    else if (strcmp(word, root->word) > 0)
+        root->right = delete(root->right, word);
+    else {
+        if (root->left == NULL) {
+            struct Node *temp = root->right;
+            free(root);
+            return temp;
+        }
+        else if (root->right == NULL) {
+            struct Node *temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        struct Node *temp = findMin(root->right);
+
+        strcpy(root->word, temp->word);
+        strcpy(root->meaning, temp->meaning);
+
+        root->right = delete(root->right, temp->word);
+    }
+
+    return root;
+}
+
+void inorder(struct Node *root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%s : %s\n", root->word, root->meaning);
+        inorder(root->right);
+    }
+}
+
+int main() {
+    struct Node *root = NULL;
+
+    root = insert(root, "apple", "a fruit");
+    root = insert(root, "book", "collection of pages");
+    root = insert(root, "cat", "a small animal");
+    root = insert(root, "dog", "a loyal animal");
+    root = insert(root, "elephant", "a large animal");
+
+    printf("Dictionary:\n");
+    inorder(root);
+
+    printf("\nSearching for book:\n");
+    search(root, "book");
+
+    printf("\nDeleting apple\n");
+    root = delete(root, "apple");
+
+    printf("\nDictionary after deletion:\n");
+    inorder(root);
+
+    return 0;
+}
