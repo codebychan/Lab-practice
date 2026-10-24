@@ -35,3 +35,175 @@ struct Node *createPolynomial() {
 
     return head;
 }
+
+void display(struct Node *head) {
+    struct Node *temp = head;
+
+    if (temp == NULL) {
+        printf("0\n");
+        return;
+    }
+
+    while (temp != NULL) {
+        printf("%dx^%d", temp->coeff, temp->exp);
+
+        if (temp->next != NULL)
+            printf(" + ");
+
+        temp = temp->next;
+    }
+
+    printf("\n");
+}
+
+struct Node *add(struct Node *p, struct Node *q) {
+    struct Node *result = NULL, *tail = NULL, *newNode;
+    int coeff, exp;
+
+    while (p != NULL && q != NULL) {
+        if (p->exp == q->exp) {
+            coeff = p->coeff + q->coeff;
+            exp = p->exp;
+            p = p->next;
+            q = q->next;
+        }
+        else if (p->exp > q->exp) {
+            coeff = p->coeff;
+            exp = p->exp;
+            p = p->next;
+        }
+        else {
+            coeff = q->coeff;
+            exp = q->exp;
+            q = q->next;
+        }
+
+        if (coeff != 0) {
+            newNode = malloc(sizeof(struct Node));
+            newNode->coeff = coeff;
+            newNode->exp = exp;
+            newNode->next = NULL;
+
+            if (result == NULL)
+                result = tail = newNode;
+            else {
+                tail->next = newNode;
+                tail = newNode;
+            }
+        }
+    }
+
+    while (p != NULL) {
+        newNode = malloc(sizeof(struct Node));
+        newNode->coeff = p->coeff;
+        newNode->exp = p->exp;
+        newNode->next = NULL;
+
+        if (result == NULL)
+            result = tail = newNode;
+        else {
+            tail->next = newNode;
+            tail = newNode;
+        }
+
+        p = p->next;
+    }
+
+    while (q != NULL) {
+        newNode = malloc(sizeof(struct Node));
+        newNode->coeff = q->coeff;
+        newNode->exp = q->exp;
+        newNode->next = NULL;
+
+        if (result == NULL)
+            result = tail = newNode;
+        else {
+            tail->next = newNode;
+            tail = newNode;
+        }
+
+        q = q->next;
+    }
+
+    return result;
+}
+
+struct Node *multiply(struct Node *p, struct Node *q) {
+    struct Node *result = NULL, *temp1 = p, *temp2;
+    struct Node *newNode, *temp, *prev;
+    int coeff, exp;
+
+    while (temp1 != NULL) {
+        temp2 = q;
+
+        while (temp2 != NULL) {
+            coeff = temp1->coeff * temp2->coeff;
+            exp = temp1->exp + temp2->exp;
+
+            temp = result;
+            prev = NULL;
+
+            while (temp != NULL && temp->exp > exp) {
+                prev = temp;
+                temp = temp->next;
+            }
+
+            if (temp != NULL && temp->exp == exp) {
+                temp->coeff += coeff;
+
+                if (temp->coeff == 0) {
+                    if (prev == NULL)
+                        result = temp->next;
+                    else
+                        prev->next = temp->next;
+
+                    free(temp);
+                }
+            }
+            else if (coeff != 0) {
+                newNode = malloc(sizeof(struct Node));
+                newNode->coeff = coeff;
+                newNode->exp = exp;
+                newNode->next = temp;
+
+                if (prev == NULL)
+                    result = newNode;
+                else
+                    prev->next = newNode;
+            }
+
+            temp2 = temp2->next;
+        }
+
+        temp1 = temp1->next;
+    }
+
+    return result;
+}
+
+int main() {
+    struct Node *p, *q, *sum, *product;
+
+    printf("First polynomial:\n");
+    p = createPolynomial();
+
+    printf("Second polynomial:\n");
+    q = createPolynomial();
+
+    sum = add(p, q);
+    product = multiply(p, q);
+
+    printf("\nFirst polynomial: ");
+    display(p);
+
+    printf("Second polynomial: ");
+    display(q);
+
+    printf("Sum: ");
+    display(sum);
+
+    printf("Product: ");
+    display(product);
+
+    return 0;
+}
