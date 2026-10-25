@@ -1,0 +1,78 @@
+//webnav
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Node {
+    char page[50];
+    struct Node *prev, *next;
+};
+
+struct Node *current = NULL;
+
+void visit(char page[]) {
+    struct Node *newNode = malloc(sizeof(struct Node));
+
+    strcpy(newNode->page, page);
+    newNode->prev = current;
+    newNode->next = NULL;
+
+    if (current != NULL) {
+        current->next = newNode;
+    }
+
+    current = newNode;
+
+    printf("Visited: %s\n", current->page);
+}
+
+void backward() {
+    if (current != NULL && current->prev != NULL) {
+        current = current->prev;
+        printf("Current page: %s\n", current->page);
+    } else {
+        printf("No previous page!\n");
+    }
+}
+
+void forward() {
+    if (current != NULL && current->next != NULL) {
+        current = current->next;
+        printf("Current page: %s\n", current->page);
+    } else {
+        printf("No next page!\n");
+    }
+}
+
+int main() {
+    int choice;
+    char page[50];
+
+    while (1) {
+        printf("\n1. Visit Page\n2. Backward\n3. Forward\n4. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter page name: ");
+                scanf("%s", page);
+                visit(page);
+                break;
+
+            case 2:
+                backward();
+                break;
+
+            case 3:
+                forward();
+                break;
+
+            case 4:
+                return 0;
+
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+}
